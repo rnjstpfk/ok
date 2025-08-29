@@ -1,0 +1,122 @@
+@import "../styles/variables";
+
+.eatables-page {
+  background: $cream;
+  color: $text;
+}
+
+.page-banner {
+  background: #2f2f2f;
+  color: #fff;
+  text-align: center;
+  font-weight: 800;
+  letter-spacing: .6px;
+  font-size: 12px;
+  padding: 6px 8px;
+}
+
+.product {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: clamp(20px, 4vw, 40px);
+  padding: clamp(22px, 4vw, 36px) 0;
+
+  @media (max-width: 980px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.product-media {
+  margin: 0;
+
+  img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 2px;
+  }
+}
+
+.product-info {
+  display: grid;
+  align-content: start;
+  gap: clamp(14px, 2.6vw, 20px);
+}
+
+.title-wrap {
+  .title {
+    margin: 0 0 6px;
+    line-height: .9;
+    font-weight: 900;
+    color: #121212;
+
+    span {
+      display: block;
+      font-size: clamp(28px, 6vw, 44px);
+    }
+  }
+  .price {
+    font-size: clamp(20px, 3.4vw, 28px);
+    font-weight: 900;
+  }
+}
+
+/* 비활성 버튼 */
+.btn-disabled {
+  width: 100%;
+  background: #cfcfcf;
+  color: #fff;
+  border: 0;
+  border-radius: 6px;
+  padding: 12px 14px;
+  font-weight: 800;
+  letter-spacing: .5px;
+  cursor: not-allowed;
+  opacity: .9;
+}
+
+/* 성분표 */
+.ingredients {
+  border-top: 1px solid rgba(0,0,0,.12);
+  padding-top: 10px;
+
+  summary {
+    list-style: none;
+    cursor: default;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  summary::-webkit-details-marker { display: none; }
+
+  .ing-body {
+    line-height: 1.6;
+  }
+}
+
+/* 공유 아이콘 */
+.share {
+  display: flex;
+  gap: 14px;
+  color: #2c2c2c;
+
+  a { color: inherit; }
+  a:hover { opacity: .8; }
+}
+
+/* 설명 */
+.desc {
+  line-height: 1.7;
+  p { margin: 0 0 12px; }
+
+  .bold { font-weight: 800; }
+  .note { font-weight: 700; }
+
+  .faq {
+    color: #6c2bd9;
+    font-weight: 800;
+    text-underline-offset: 3px;
+  }
+}
+
+/* 컨테이너 폭(사이트 컨벤션) */
+.container { max-width: 1100px; margin: 0 auto; padding: 0 18px; }

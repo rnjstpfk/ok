@@ -202,10 +202,28 @@ $nav-accent: #8490c8;
 .cart-body .empty { color: #666; font-size: 16px; }
 
 /* 장바구니 버튼 색(원하면 조정) */
-.cart-btn { color: #6b6b6b; transition: color .18s ease, transform .1s ease; }
-.cart-btn:hover { color: $nav-accent; transform: translateY(-1px); }
+.cart-btn {
+  color: #6b6b6b;
+  transition: color .18s ease;
+}
+.cart-btn:hover {
+  color: $nav-accent;
+}
 
 /* 모바일 최적화 */
 @media (max-width: 900px) {
   .cart-panel { width: 86vw; }
+  .cart-btn:hover {
+    color: $nav-accent;
+    /* transform 제거 → 안 움직이고 색만 변함 */
+  }
 }
+
+
+
+
+
+
+
+
+
