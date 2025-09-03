@@ -323,3 +323,25 @@ $nav-accent: #8490c8;
   width: calc(100% - 32px);
 }
 .cart-cta:hover { filter: brightness(.95); }
+
+
+
+
+
+
+
+
+
+
+
+
+.auth-controls .btn-primary {
+  display:inline-flex; align-items:center;
+  padding:6px 12px; border-radius:10px;
+  background:#111; color:#fff; border:1px solid #111; cursor:pointer;
+}
+.auth-controls .btn-ghost {
+  padding:6px 10px; border-radius:10px;
+  background:#fff; color:#111; border:1px solid #ddd; cursor:pointer;
+}
+.mm .btn-primary, .mm .btn-ghost { font-size:14px; }

@@ -4,6 +4,7 @@ import Logo from "./Logo";
 import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { useCart } from "../contexts/CartContext";
+import { auth, onAuth, watchIsAdmin, signOutUser } from "../firebase";
 
 /* === 아이콘 === */
 function UserIcon({ size = 20 }) {
@@ -17,24 +18,38 @@ function BagIcon({ size = 22 }) {
   return (
     <svg width={size} height={size} viewBox="5.7 0 105.5 126.1" preserveAspectRatio="xMinYMax meet" fill="currentColor" aria-hidden="true">
       <path d="M99.8 28.4c0-1.2-0.9-2-2.1-2h-15c0 3.2 0 7.6 0 8.2 0 1.5-1.2 2.6-2.6 2.9 -1.5 0.3-2.9-0.9-3.2-2.3 0-0.3 0-0.3 0-0.6 0-0.9 0-4.7 0-8.2H40.1c0 3.2 0 7.3 0 8.2 0 1.5-1.2 2.9-2.6 2.9 -1.5 0-2.9-0.9-3.2-2.3 0-0.3 0-0.3 0-0.6 0-0.6 0-5 0-8.2h-15c-1.2 0-2 0.9-2 2L8.3 124c0 1.2 0.9 2.1 2.1 2.1h96.3c1.2 0 2.1-0.9 2.1-2.1L99.8 28.4z"></path>
-      <path d="M59.1 5.9c-2.9 0-2 0-2.9 0 -2 0-4.4 0.6-6.4 1.5 -3.2 1.5-5.9 4.1-7.6 7.3 -0.9 1.8-1.5 3.5-1.8 5.6 0 0.9-0.3 1.5-0.3 2.3 0 1.2 0 2.1 0 3.2 0 1.5-1.2 2.9-2.6 2.9 -1.5 0-2.9-0.9-3.2-2.3 0-0.3 0-0.3 0-0.6 0-1.2 0-2.3 0-3.5 0-3.2 0.9-6.4 2-9.4 1.2-2.3 2.6-4.7 4.7-6.4 3.2-2.9 6.7-5 11.1-5.9C53.5 0.3 55 0 56.7 0c1.5 0 2.9 0 4.4 0 2.9 0 5.6 0.6 7.9 1.8 2.6 1.2 5 2.6 6.7 4.4 3.2 3.2 5.3 6.7 6.4 11.1 0.3 1.5 0.6 3.2 0.6 4.7 0 1.2 0 2.3 0 3.2 0 1.5-1.2 2.6-2.6 2.9s-2.9-0.9-3.2-2.3c0-0.3 0-0.3 0-0.6 0-1.2 0-2.6 0-3.8 0-2.3-0.6-4.4-1.8-6.4 -1.5-3.2-4.1-5.9-7.3-7.3 -1.8-0.9-3.5-1.8-5.9-1.8C61.1 5.9 59.1 5.9 59.1 5.9L59.1 5.9z"></path>
+      <path d="M59.1 5.9c-2.9 0-2 0-2.9 0 -2 0-4.4 0.6-6.4 1.5 -3.2 1.5-5.9 4.1-7.6 7.3 -0.9 1.8-1.5 3.5-1.8 5.6 0 0.9-0.3 1.5-0.3 2.3 0 1.2 0 2.1 0 3.2 0 1.5-1.2 2.6-2.6 2.9 -1.5 0-2.9-0.9-3.2-2.3 0-0.3 0-0.3 0-0.6 0-1.2 0-2.3 0-3.5 0-3.2 0.9-6.4 2-9.4 1.2-2.3 2.6-4.7 4.7-6.4 3.2-2.9 6.7-5 11.1-5.9C53.5 0.3 55 0 56.7 0c1.5 0 2.9 0 4.4 0 2.9 0 5.6 0.6 7.9 1.8 2.6 1.2 5 2.6 6.7 4.4 3.2 3.2 5.3 6.7 6.4 11.1 0.3 1.5 0.6 3.2 0.6 4.7 0 1.2 0 2.3 0 3.2 0 1.5-1.2 2.6-2.6 2.9s-2.9-0.9-3.2-2.3c0-0.3 0-0.3 0-0.6 0-1.2 0-2.6 0-3.8 0-2.3-0.6-4.4-1.8-6.4 -1.5-3.2-4.1-5.9-7.3-7.3 -1.8-0.9-3.5-1.8-5.9-1.8C61.1 5.9 59.1 5.9 59.1 5.9L59.1 5.9z"></path>
     </svg>
   );
 }
 
 /* === 모바일 메뉴 === */
-function MobileMenu({ open, onClose }) {
+function MobileMenu({ open, onClose, user, isAdmin, onLogout }) {
   return (
     <div className={`mm ${open ? "show" : ""}`} role="dialog" aria-modal="true" aria-label="Mobile menu">
       <div className="mm-backdrop" onClick={onClose} />
       <aside className="mm-panel">
         <div className="mm-header">
           <button className="mm-close" aria-label="Close menu" onClick={onClose}>×</button>
-          {/* 로그인은 페이지로 이동 */}
-          <NavLink to="/account" className="mm-login" onClick={onClose}>
-            <UserIcon /><span>Log In</span>
-          </NavLink>
+
+          {!user ? (
+            <div className="mm-login">
+              <NavLink to="/account" onClick={onClose} className="btn-primary" style={{ display:"inline-flex",alignItems:"center" }}>
+                <UserIcon /><span style={{ marginLeft: 6 }}>Log In</span>
+              </NavLink>
+            </div>
+          ) : (
+            <div className="mm-login" style={{ display:"flex", alignItems:"center", gap:8 }}>
+              {user.photoURL && <img src={user.photoURL} alt="" style={{ width: 28, height: 28, borderRadius: "50%" }} />}
+              <span>
+                {user.displayName || user.email}
+                {isAdmin && <span style={{ color:"#10b981", marginLeft:6 }}>(Admin)</span>}
+              </span>
+              <button onClick={onLogout} className="btn-ghost" style={{ marginLeft: 8 }}>Log Out</button>
+            </div>
+          )}
         </div>
+
         <nav className="mm-nav">
           <NavLink to="/" end onClick={onClose}>Home</NavLink>
           <NavLink to="/eatables" onClick={onClose}>Eatables</NavLink>
@@ -53,92 +68,70 @@ function MobileMenu({ open, onClose }) {
   );
 }
 
-/* === 카트 드로어 (전역 카트 사용) === */
-/* === 카트 드로어 (첫번째 스샷 스타일) === */
+/* === 카트 드로어 === */
 function CartDrawer() {
   const { open, closeCart, items, removeItem, subtotal } = useCart();
-
   return (
     <div className={`cart ${open ? "show" : ""}`} role="dialog" aria-modal="true" aria-label="Cart drawer">
       <div className="cart-backdrop" onClick={closeCart} />
       <aside className="cart-panel">
-        {/* ─ Topbar ─ */}
         <div className="cart-topbar">
-          <div className="cart-title">
-            MY CART <span className="count">({items.length} items)</span>
-          </div>
+          <div className="cart-title">MY CART <span className="count">({items.length} items)</span></div>
           <button className="cart-x" onClick={closeCart} aria-label="Close">×</button>
         </div>
-
-        {/* ─ List ─ */}
         <div className="cart-list">
-          {items.length === 0 ? (
-            <p className="empty">Your cart is empty.</p>
-          ) : (
-            items.map((it) => (
-              <div key={it.id} className="cart-row">
-                <img className="thumb" src={it.img} alt="" />
-                <div className="info">
-                  <div className="name">{it.name}</div>
-                  <div className="meta">
-                    <span className="price">${(it.price || 0).toFixed(2)}</span>
-                    <div className="qty">
-                      <button disabled aria-label="decrease">−</button>
-                      <span>{it.qty || 1}</span>
-                      <button disabled aria-label="increase">＋</button>
-                    </div>
+          {items.length === 0 ? <p className="empty">Your cart is empty.</p> : items.map((it) => (
+            <div key={it.id} className="cart-row">
+              <img className="thumb" src={it.img} alt="" />
+              <div className="info">
+                <div className="name">{it.name}</div>
+                <div className="meta">
+                  <span className="price">${(it.price || 0).toFixed(2)}</span>
+                  <div className="qty">
+                    <button disabled aria-label="decrease">−</button>
+                    <span>{it.qty || 1}</span>
+                    <button disabled aria-label="increase">＋</button>
                   </div>
                 </div>
-                <div className="line-total">${(((it.price || 0) * (it.qty || 1)) || 0).toFixed(2)}</div>
-                <button className="remove" onClick={() => removeItem(it.id)} aria-label="Remove">🗑</button>
-
-                {it.available === false && (
-                  <div className="alert">
-                    <span>Sorry, this item is no longer available.</span>
-                  </div>
-                )}
               </div>
-            ))
-          )}
+              <div className="line-total">${(((it.price || 0) * (it.qty || 1)) || 0).toFixed(2)}</div>
+              <button className="remove" onClick={() => removeItem(it.id)} aria-label="Remove">🗑</button>
+              {it.available === false && <div className="alert"><span>Sorry, this item is no longer available.</span></div>}
+            </div>
+          ))}
         </div>
-
-        {/* ─ Promo ─ */}
-        <div className="cart-promo">
-          <button type="button" className="promo-link">Enter a promo code</button>
-        </div>
-
-        {/* ─ Footer ─ */}
-        <div className="cart-est">
-          <span>Estimated total</span>
-          <strong>${subtotal.toFixed(2)}</strong>
-        </div>
+        <div className="cart-promo"><button type="button" className="promo-link">Enter a promo code</button></div>
+        <div className="cart-est"><span>Estimated total</span><strong>${subtotal.toFixed(2)}</strong></div>
         <button className="cart-cta">View Cart</button>
       </aside>
     </div>
   );
 }
 
-
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const { open, openCart } = useCart(); // 전역 카트 오픈 상태
+  const { open, openCart } = useCart();
+
+  // 로그인 상태
+  const [user, setUser] = useState(auth.currentUser);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    const offAuth = onAuth(u => setUser(u || null));
+    const offAdmin = watchIsAdmin(setIsAdmin);
+    return () => { offAuth && offAuth(); offAdmin && offAdmin(); };
+  }, []);
 
   // 오버레이 열릴 때 스크롤 잠금
   useEffect(() => {
     const modalOpen = menuOpen || open;
     document.body.style.overflow = modalOpen ? "hidden" : "";
-    const onKey = (e) => {
-      if (e.key === "Escape") {
-        if (menuOpen) setMenuOpen(false);
-        // cart는 CartDrawer 내부 closeCart 버튼/백드롭으로 닫음
-      }
-    };
+    const onKey = (e) => { if (e.key === "Escape" && menuOpen) setMenuOpen(false); };
     window.addEventListener("keydown", onKey);
-    return () => {
-      window.removeEventListener("keydown", onKey);
-      document.body.style.overflow = "";
-    };
+    return () => { window.removeEventListener("keydown", onKey); document.body.style.overflow = ""; };
   }, [menuOpen, open]);
+
+  const onLogout = () => signOutUser();
 
   return (
     <>
@@ -162,17 +155,28 @@ export default function Header() {
           </nav>
 
           <div className="right">
-            {/* 로그인은 페이지로 이동 */}
-            <NavLink to="/account" className="login-link" aria-label="Log In">
-              <UserIcon /><span>Log In</span>
-            </NavLink>
+            {/* 로그인 컨트롤(데스크톱): 계정 페이지 링크 사용 */}
+            {!user ? (
+              <NavLink to="/account" className="login-link" aria-label="Log In" style={{ display:"inline-flex", alignItems:"center" }}>
+                <UserIcon /><span style={{ marginLeft: 6 }}>Log In</span>
+              </NavLink>
+            ) : (
+              <div className="auth-controls" style={{ display:"flex", alignItems:"center", gap:8 }}>
+                {user.photoURL && <img src={user.photoURL} alt="" style={{ width:24, height:24, borderRadius:"50%" }} />}
+                <span style={{ fontSize:14 }}>
+                  {user.displayName || user.email}
+                  {isAdmin && <span style={{ color:"#10b981", marginLeft:6 }}>(Admin)</span>}
+                </span>
+                <button className="btn-ghost" onClick={onLogout}>Log Out</button>
+              </div>
+            )}
 
             {/* 전역 카트 열기 */}
             <button className="icon-btn cart-btn" aria-label="cart" onClick={openCart}>
               <BagIcon />
             </button>
 
-            {/* 모바일 메뉴 */}
+            {/* 모바일 메뉴 버튼 */}
             <button
               className="hamburger"
               onClick={() => setMenuOpen(v => !v)}
@@ -186,7 +190,13 @@ export default function Header() {
       </header>
 
       {/* 오버레이들 */}
-      <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} />
+      <MobileMenu
+        open={menuOpen}
+        onClose={() => setMenuOpen(false)}
+        user={user}
+        isAdmin={isAdmin}
+        onLogout={onLogout}
+      />
       <CartDrawer />
     </>
   );

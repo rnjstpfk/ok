@@ -169,3 +169,24 @@ $accent-soft: #ffe5de;  // hover시 배경 살짝
       }
     }
   }
+
+
+
+
+
+
+
+.blog-detail .hero { max-width: 840px; margin: 0 auto 24px; }
+.blog-detail .hero img { width:100%; border-radius:16px; margin-bottom:16px; }
+.blog-detail .meta { display:flex; gap:12px; align-items:center; color:#666; }
+.blog-detail .content { max-width: 840px; margin: 16px auto; line-height: 1.8; font-size: 18px; }
+.blog-detail .comments { max-width: 840px; margin: 32px auto; }
+.comment-form { display:flex; flex-direction:column; gap:8px; }
+.comment-form textarea { min-height: 96px; padding:12px; }
+.like-btn { border:1px solid #ddd; border-radius:999px; padding:6px 12px; }
+.like-btn.on { background:#111; color:#fff; border-color:#111; }
+
+
+
+
+
